@@ -1,0 +1,167 @@
+---
+title: "Practice Graphs"
+#author: "Madeleine Sherry"
+#date: "2023-09-27"
+header-includes:
+  - \usepackage{float}
+  - \floatplacement{figure}{H}
+output: pdf_document
+---
+# Here's a link to all the ways we can customize our plots
+#https://www.cedricscherer.com/2019/08/05/a-ggplot2-tutorial-for-beautiful-plotting-in-r/
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE,message=FALSE,warning=FALSE, fig.align = 'center', out.width="75%")
+```
+
+```{r load-packages, message = FALSE}
+library(tidyverse)
+library(showtext)
+```
+
+```{r}
+font_add_google("Lora", ## name of Google font
+                "Lora")  ## name that will be used in R
+
+t <- list(
+  family = "Lora",
+  size = 14)
+```
+
+```{r}
+library(readr)
+df <- read_csv("~/Documents/factbook.csv")
+df
+```
+
+```{r}
+colnames(df) <- c("year", "total_finaid_spending", "total_finaid_spending_cpi", "end_per_student", "end_per_student_cpi", "avg_schol_need", "avg_schol_need_cpi", "avg_schol_noneed", "avg_schol_noneed_cpi", "avg_finaid_need", "avg_finaid_noneed", "avg_debt", "avg_debt_cpi", "percent_grads_debt", "percent_fall_firstgen", "percent_fall_pell", 
+                  "percent_domestic_poc", "percent_international", "avg_schol", "avg_schol_cpi")  # change column names of all the columns in the dataframe 
+print(df)
+```
+
+```{r}
+# Total fin aid spending
+
+ ggplot(df, aes(x=year, y=total_finaid_spending)) +
+  geom_line(color = "blue", size = 3)+
+  theme_classic()+
+  labs(x ="Year", y ="Total financial aid spending (in thousands)", title= "Total Financial Aid Spending Since 2006")
+
+#__________________________
+
+library(plotly)
+
+fig1 <- plot_ly(df, x = ~year, y = ~ total_finaid_spending_cpi, type = 'bar', name = 'Total Fin Aid Spending', marker = list(color = 'rgb(255,198,39)'))
+fig1 <- fig1 %>% layout(
+         xaxis = list(title = "Year"),
+         yaxis = list(title = ""), font=t, margin = mrg)
+fig1
+```
+
+```{r}
+# Avg scholarship for all (except this is the sum so we need to average it)
+
+ ggplot(df, aes(x=year, y=avg_schol_cpi)) +
+  geom_point()+
+  labs(x ="Year", y ="Sum of schol for need and no need", 
+       title= "Schol")+
+  theme_classic()+
+       (theme(plot.title = element_text(family = "Lora", hjust = .5, size = 15)))
+
+# Dots are connected with line segments
+ ggplot(df, aes(x=year, y=avg_schol_cpi)) +
+  geom_point()+
+  geom_line()+
+  labs(x ="Year", y ="Average scholarship", title= "Average scholarship since 2006")
+
+# Average schol for need
+
+ ggplot(df, aes(x=year, y=avg_schol_need_cpi)) +
+  geom_point()+
+  geom_line()+
+  labs(x ="Year", y ="Average scholarship awarded, students with need", title= "AAverage scholarship awarded, students with need since 2006")
+
+# Average for no need
+
+ ggplot(df, aes(x=year, y=avg_schol_noneed_cpi)) +
+  geom_point()+
+   geom_line()+
+  labs(x ="Year", y ="Average scholarship awarded, students with no need", title= "Average scholarship awarded, students with no need since 2006")
+
+#_________________
+
+mrg <- list(l = 50, r = 50,
+          b = 50, t = 50,
+          pad = 20)
+
+fig <- plot_ly(df, x = ~year, y = ~ avg_schol_need_cpi, type = 'bar', name = 'Need', marker = list(color = 'rgb(255,198,39)'))
+fig <- fig %>% add_trace(y = ~avg_schol_cpi, name = 'Average', marker = list(color = 'rgb(0, 40, 104)'))
+fig <- fig %>% add_trace(y = ~avg_schol_noneed_cpi, name = 'No Need', marker= list(color = 'rgb(108,178,226)'))
+fig <- fig %>% layout(yaxis = list(title = ''), xaxis = list(title = 'Year'), title='',barmode = 'group', font=t, margin = mrg)
+fig
+```
+
+```{r}
+# Average debt but trying to find a way to put in percent in debt as well
+
+ggplot(df)+
+        geom_col(aes(x = year, 
+                     y = avg_debt_cpi),
+                           fill = "blue",
+                 width = 0.7)+
+        theme_classic() +
+        ggtitle("Average Debt Upon Graduation")+
+        labs(x = "Year",
+             y = "Average Debt (in USD)")+
+        theme(axis.title = element_text(size = 15, face = "bold"),
+              axis.text = element_text(size = 10),
+              plot.title = element_text(size = 20, hjust = 0.5),
+              plot.subtitle = element_text(size = 15, hjust= 0.5))
+
+# Debt upon graduation
+
+ggplot(df, aes(x=year)) +                    # basic graphical object 
+  geom_point(aes(y=percent_grads_debt), colour="darkblue", size=1) +
+  labs(x ="Year", y ="Percentages", title= "% of Students in Debt Upon Graduation")+
+       (theme(plot.title = element_text(family = "Lora", hjust = .5, size = 10)))
+#___________________________
+
+fig3 <- plot_ly(df, x = ~year, y = ~ avg_debt_cpi, type = 'bar', name = 'Average Debt', marker = list(color = 'rgb(255,198,39)'))
+fig3 <- fig3 %>% layout(title = "",
+         xaxis = list(title = "Year"),
+         yaxis = list(title = ""), font=t, margin = mrg)
+fig3
+
+fig2 <- plot_ly(df, x = ~year, y = ~percent_grads_debt, type = 'scatter', mode = 'lines',color = 'rgb(255,198,39)')
+fig2 <- fig2 %>% layout(title = "",
+         xaxis = list(title = "Year"),
+         yaxis = list(title = ""), font=t, margin = mrg)
+fig2
+```
+
+
+
+```{r}
+#"percent_fall_firstgen", "percent_fall_pell", 
+  #                "percent_domestic_poc"
+
+ggplot(df, aes(x=year)) +                    # basic graphical object 
+  geom_line(aes(y=percent_fall_firstgen), colour="darkblue", size=1) +  # first layer 
+  geom_line(aes(y=percent_fall_pell), colour="lightblue", size=1)+
+  geom_line(aes(y=percent_domestic_poc), colour="mediumblue", size=1)+
+  labs(x ="Year", y ="Percentages", title= "% First Gen Students, % of Pell Recipients, % Domestic Students of Color")+
+       (theme(plot.title = element_text(family = "Lora", hjust = .5, size = 10)))
+
+#___________________________
+
+library(plotly)
+
+fig <- plot_ly(df, x = ~year, y = ~ percent_domestic_poc, type = 'bar', name = 'Students of Color %', marker = list(color = 'rgb(255,198,39)'))
+fig <- fig %>% add_trace(y = ~percent_fall_pell, name = 'Pell Eligible %', marker = list(color = 'rgb(0, 40, 104)'))
+fig <- fig %>% add_trace(y = ~percent_fall_firstgen, name = 'First Generation %', marker= list(color = 'rgb(108,178,226)'))
+fig <- fig %>% layout(yaxis = list(title = 'Percent'), xaxis = list(title = 'Year'), title='', barmode = 'group', font=t, margin = mrg)
+
+fig
+
+```
