@@ -8,3 +8,5 @@ Here is some new stuff
 Plotly Exported Oct 10, 2023 Location Data
 {% include_relative Plotly/Oct10.html %}
 
+## Endowment choropleth by region ##
+{% include_relative Plotly/endowment.html %}
