@@ -9,4 +9,5 @@ Plotly Exported Oct 10, 2023 Location Data
 {% include_relative Plotly/Oct10.html %}
 
 ## Endowment choropleth by region ##
-{% include_relative Plotly/endowment.html %}
+First number when mouse is hovered is what region (or state) it belongs to. Next is the value of the endowment needed to fully bridge financial aid gapping.
+{% include_relative Plotly/choropleth.html %}
